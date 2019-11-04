@@ -1,0 +1,2 @@
+include ':app', ':AndroidMark'
+rootProject.name='AndroidMarkTestApp'
