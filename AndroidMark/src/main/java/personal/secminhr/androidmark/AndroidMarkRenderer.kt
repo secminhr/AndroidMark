@@ -9,69 +9,50 @@ class AndroidMarkRenderer private constructor(val builder: Builder) {
 
     fun render(node: Node, parent: LinearLayout, context: Context) {
         val mark = nodeToMark(node, context)
-        holdMark(mark)
-        parent.addView(mark.getView())
+        renderMark(mark, parent)
     }
 
     private fun nodeToMark(node: Node, context: Context): Mark {
         val map = mapOf(
             Text::class.java.simpleName to TextMark::class,
-            Heading::class.java.simpleName to HeadingMark::class,
             Document::class.java.simpleName to DocumentMark::class,
             Paragraph::class.java.simpleName to ParagraphMark::class,
-            BulletList::class.java.simpleName to BulletListMark::class,
-            ListItem::class.java.simpleName to ListItemMark::class
+            SoftLineBreak::class.java.simpleName to SoftLineBreakMark::class,
+            HardLineBreak::class.java.simpleName to HardLineBreakMark::class,
+            Emphasis::class.java.simpleName to EmphasisMark::class,
+            StrongEmphasis::class.java.simpleName to StrongEmphasisMark::class
         )
         val k = map[node::class.java.simpleName]
         val mark = k?.constructors?.first()?.call(context, node)!!
-        return if(node.firstChild == null) {
-            mark
-        } else {
-            var currentNode = node.firstChild
-            while(currentNode != null) {
-                val m = nodeToMark(currentNode, context)
+        if(mark is WithChildrenMark) {
+            traverseChildren(node) { child ->
+                val m = nodeToMark(child, context)
                 mark.appendChild(m)
-                currentNode = currentNode.next
             }
-            mark
+        }
+        return mark
+    }
+
+    private fun traverseChildren(parent: Node, traversal: (Node) -> Unit) {
+        var currentNode = parent.firstChild
+        while(currentNode != null) {
+            traversal(currentNode)
+            currentNode = currentNode.next
         }
     }
 
-    private fun holdMark(mark: Mark) {
-        mark.holdSelf()
-        val m = mark.firstChild
-        m?.let {
-            var currentMark: Mark? = it
-            while(currentMark != null) {
-                holdMark(currentMark)
-                currentMark = currentMark.next
-            }
-        }
+    private fun renderMark(mark: Mark, parent: LinearLayout) {
+        mark.render(parent)
     }
 
     companion object {
         @JvmStatic fun builder(): Builder {
             val builder = Builder()
-            builder.addRenderer(setOf(
-
-            ))
             return builder
         }
     }
 
     class Builder {
-
-        val map = mutableMapOf<Class<out Node>, MarkNodeRenderer>()
-
-        fun addRenderer(node: Class<out Node>, renderer: MarkNodeRenderer): Builder {
-            map += node to renderer
-            return this
-        }
-
-        fun addRenderer(rendererSet: Set<Pair<Class<out Node>, MarkNodeRenderer>>): Builder {
-            map += rendererSet
-            return this
-        }
 
         fun build(): AndroidMarkRenderer {
             return AndroidMarkRenderer(this)

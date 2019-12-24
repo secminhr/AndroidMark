@@ -4,22 +4,21 @@ import android.content.Context
 import android.view.View
 import android.widget.LinearLayout
 import org.commonmark.node.Document
-import personal.secminhr.androidmark.holder.AnyMarkHolder
-import personal.secminhr.androidmark.holder.Holder
 
-class DocumentMark(context: Context, override var node: Document): Mark(context) {
+class DocumentMark(context: Context, override var node: Document): WithChildrenMark(context) {
     private val layout = LinearLayout(context)
-    override var holder: Holder<in Mark> = AnyMarkHolder(layout)
 
     init {
         layout.orientation = LinearLayout.VERTICAL
     }
 
-    override fun holdChild(element: Mark) {
-        holder.holds(element)
-    }
-
-    override fun getView(): View? {
-        return holder.getView()
+    override fun render(layout: View) {
+        check(layout is LinearLayout) { "DocumentMark must be rendered inside a LinearLayout" }
+        var child = firstChild
+        while(child != null) {
+            child.render(layout)
+            child = child.next
+        }
+        layout.addView(this.layout)
     }
 }

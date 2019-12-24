@@ -2,13 +2,14 @@ package personal.secminhr.androidmark.mark
 
 import android.content.Context
 import android.view.View
-import org.commonmark.node.Emphasis
+import org.commonmark.node.StrongEmphasis
 import personal.secminhr.androidmark.view.AMTextView
 
-class EmphasisMark(context: Context, override val node: Emphasis): WithChildrenMark(context) {
+class StrongEmphasisMark(context: Context, override val node: StrongEmphasis): WithChildrenMark(context) {
+
     override fun render(layout: View) {
-        check(layout is AMTextView) { "EmphasisMark must be rendered inside a AndroidMarkTextView" }
-        layout.shouldUseItalic = true
+        check(layout is AMTextView) { "StrongEmphasisMark must be rendered inside a AndroidMarkTextView" }
+        layout.shouldUseBold = true
 
         var child = firstChild
         while(child != null) {
@@ -16,5 +17,4 @@ class EmphasisMark(context: Context, override val node: Emphasis): WithChildrenM
             child = child.next
         }
     }
-
 }

@@ -11,6 +11,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val mark = AndroidMark()
-        mark.render("- a;sdlkfja;sdlkfjas;ldkfjas;ldkfjas;ldkfjas;dlkfjads;lkfj\n- kadkfldkfjkdjfskjdfkjsdjfksfjsdkfjkdsjfkjdskfjdskfkdsjfkds", main, this)
+        val markdown = """
+            kdkdkdklsldl  
+            ***kdka;sdlkfj***
+            
+            alskdfjsad;lkjfkc,
+        """.trimIndent()
+        mark.render(markdown, main, this)
     }
 }
